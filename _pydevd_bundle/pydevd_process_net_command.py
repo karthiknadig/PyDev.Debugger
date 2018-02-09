@@ -250,7 +250,10 @@ def process_net_command(py_db, cmd_id, seq, text):
                 # text is file\tline. Add to breakpoints dictionary
                 suspend_policy = "NONE"
                 if py_db._set_breakpoints_with_id:
-                    breakpoint_id, type, file, line, func_name, condition, expression = text.split('\t', 6)
+                    try:
+                        breakpoint_id, type, file, line, func_name, condition, expression, hit_count = text.split('\t', 7)
+                    except:
+                        breakpoint_id, type, file, line, func_name, condition, expression = text.split('\t', 6)
 
                     breakpoint_id = int(breakpoint_id)
                     line = int(line)
@@ -293,8 +296,12 @@ def process_net_command(py_db, cmd_id, seq, text):
                 if len(expression) <= 0 or expression is None or expression == "None":
                     expression = None
 
+                if hit_count is not None:
+                    hit_count = int(hit_count)
+                    hit_count = hit_count if hit_count > 0 else None
+
                 if type == 'python-line':
-                    breakpoint = LineBreakpoint(line, condition, func_name, expression, suspend_policy)
+                    breakpoint = LineBreakpoint(line, condition, func_name, expression, suspend_policy, hit_count)
                     breakpoints = py_db.breakpoints
                     file_to_id_to_breakpoint = py_db.file_to_id_to_line_breakpoint
                     supported_type = True

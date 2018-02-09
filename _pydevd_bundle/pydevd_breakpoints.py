@@ -44,12 +44,14 @@ class ExceptionBreakpoint:
 
 
 class LineBreakpoint(object):
-    def __init__(self, line, condition, func_name, expression, suspend_policy="NONE"):
+    def __init__(self, line, condition, func_name, expression, suspend_policy="NONE", hit_count=None):
         self.line = line
         self.condition = condition
         self.func_name = func_name
         self.expression = expression
         self.suspend_policy = suspend_policy
+        self.hit_count = hit_count
+        self.hits = 0
         # need for frame evaluation: list of code objects, which bytecode was modified by this breakpoint
         self.code_objects = set()
 

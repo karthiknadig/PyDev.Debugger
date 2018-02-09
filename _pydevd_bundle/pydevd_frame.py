@@ -37,9 +37,16 @@ get_file_type = DONT_TRACE.get
 
 
 def handle_breakpoint_condition(py_db, info, breakpoint, new_frame):
+    hit_count = breakpoint.hit_count
     condition = breakpoint.condition
     try:
-        return eval(condition, new_frame.f_globals, new_frame.f_locals)
+        if hit_count is not None:
+            breakpoint.hits += 1
+            if breakpoint.hits == hit_count:
+                return True
+
+        if condition is not None:
+            return eval(condition, new_frame.f_globals, new_frame.f_locals)
 
     except:
         if type(condition) != type(''):
@@ -556,7 +563,8 @@ class PyDBFrame:
                     # lets do the conditional stuff here
                     if stop or exist_result:
                         condition = breakpoint.condition
-                        if condition is not None:
+                        hit_count = breakpoint.hit_count
+                        if condition is not None or hit_count is not None:
                             result = handle_breakpoint_condition(main_debugger, info, breakpoint, new_frame)
                             if not result:
                                 return self.trace_dispatch

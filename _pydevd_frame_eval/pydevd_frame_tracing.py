@@ -26,9 +26,10 @@ def handle_breakpoint(frame, thread, global_debugger, breakpoint):
     # ok, hit breakpoint, now, we have to discover if it is a conditional breakpoint
     new_frame = frame
     condition = breakpoint.condition
+    hit_count = breakpoint.hit_count
     info = thread.additional_info
 
-    if condition is not None:
+    if condition is not None or hit_count is not None:
         result = handle_breakpoint_condition(global_debugger, info, breakpoint, new_frame)
         if not result:
             return False
